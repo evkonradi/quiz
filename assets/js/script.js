@@ -27,6 +27,14 @@ var createContainerElement = function(){
     return containerEl;
 }
 
+//create button
+var createButton = function(textButton, classString){
+    var buttonEl = document.createElement("button");
+    buttonEl.textContent = textButton;
+    buttonEl.className = classString;
+
+    return buttonEl;
+}
 
 //add dynamicly DIV with innerHTML to the container
 var addDivContainer = function(containerEl, htmlText, classCSS){
@@ -50,6 +58,50 @@ var scoresLocalStorage = function(){
     return scores;
 }
 
+//Go Back button clicked
+var goBack = function(){
+
+}
+
+//Clear high scores button clicked
+var clearScores = function(){
+
+}
+
+// High score screen
+var highScoresScreen = function(){
+    var containerEl = createContainerElement();
+
+    //High Scores div
+    addDivContainer(containerEl, "<h2>High Scores</h2>", null );
+
+    //list of scores
+    var divListScores = addDivContainer(containerEl, "", null );
+    var scores = scoresLocalStorage();
+    ulEl = document.createElement("ul");
+    ulEl.className="scoreList";
+    for (i = 0; i < scores.length; i++){
+        liEl = document.createElement("li");
+        liEl.textContent = (i+1) + ". " + scores[i].initials + " - " + scores[i].score;
+        ulEl.appendChild(liEl);
+    }
+    divListScores.appendChild(ulEl);
+
+    //buttons
+    //enter Initials div wrapper with flex elements
+    var divEl = addDivContainer(containerEl, "", "flexWrapper");
+    var divButton1 = addDivContainer(divEl, "", "padding10");
+    var divButton2 = addDivContainer(divEl, "", "padding10");
+
+    var btnGoBack = createButton("Go Back", "btn padding10");
+    divButton1.appendChild(btnGoBack);
+    btnGoBack.addEventListener("click", goBack);
+
+    var btnClearScores = createButton("Clear High Scores", "btn padding10");
+    divButton2.appendChild(btnClearScores);
+    btnClearScores.addEventListener("click", clearScores);
+}
+
 //submit score - save to local storage
 var submitScore = function(){
     var scores = scoresLocalStorage();
@@ -62,6 +114,11 @@ var submitScore = function(){
     scores.push(scoreObject);
 
     localStorage.setItem("scoresQuiz", JSON.stringify(scores));
+
+    //generate the next screen
+    mainEl.querySelector(".page-content").remove();
+    highScoresScreen();
+    
 }
 
 //Save Score to local storage screen
@@ -75,7 +132,7 @@ var saveScoreScreen = function(){
     addDivContainer(containerEl, "<span>" + "You final score is " + score + ".</span>", null );
 
     //enter Initials div wrapper with flex elements
-    var divEl = addDivContainer(containerEl, "", "scoreSaveDiv");
+    var divEl = addDivContainer(containerEl, "", "flexWrapper");
     addDivContainer(divEl, "<span>" + "EnterInitials: </span>", "padding10");
     var divInput = addDivContainer(divEl, "", "padding10");
     divInput.appendChild(document.createElement("input"));
