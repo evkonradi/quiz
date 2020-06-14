@@ -19,6 +19,76 @@ var mainEl = document.querySelector("#mainSection");
 var questionNumber = 0;
 var score = 0;
 
+//create container element
+var createContainerElement = function(){
+    var containerEl = document.createElement("div");
+    mainEl.appendChild(containerEl);
+    containerEl.className="page-content";
+    return containerEl;
+}
+
+
+//add dynamicly DIV with innerHTML to the container
+var addDivContainer = function(containerEl, htmlText, classCSS){
+    var divEl = document.createElement("div");
+    divEl.innerHTML = htmlText;
+    if (classCSS)
+        divEl.className = classCSS;
+    containerEl.appendChild(divEl);
+
+    return divEl;
+}
+
+//get scores from Local Storage
+var scoresLocalStorage = function(){
+    var scores = localStorage.getItem("scoresQuiz");
+    if (!scores)
+        scores = [];
+    else
+        scores = JSON.parse(scores);
+
+    return scores;
+}
+
+//submit score - save to local storage
+var submitScore = function(){
+    var scores = scoresLocalStorage();
+
+    var scoreObject = {
+        initials: mainEl.querySelector("input").value,
+        score: score
+    }
+
+    scores.push(scoreObject);
+
+    localStorage.setItem("scoresQuiz", JSON.stringify(scores));
+}
+
+//Save Score to local storage screen
+var saveScoreScreen = function(){
+    var containerEl = createContainerElement();
+
+    //all done div
+    addDivContainer(containerEl, "<h2><span id='allDone'>All done!</span></h2>", null );
+
+    //your final score div
+    addDivContainer(containerEl, "<span>" + "You final score is " + score + ".</span>", null );
+
+    //enter Initials div wrapper with flex elements
+    var divEl = addDivContainer(containerEl, "", "scoreSaveDiv");
+    addDivContainer(divEl, "<span>" + "EnterInitials: </span>", "padding10");
+    var divInput = addDivContainer(divEl, "", "padding10");
+    divInput.appendChild(document.createElement("input"));
+    var divSubmit = addDivContainer(divEl, "", "padding10");
+
+    //submit button
+    var submitButtonEl = document.createElement("button");
+    submitButtonEl.textContent = "Submit";
+    submitButtonEl.className = "btn padding10";
+    divSubmit.appendChild(submitButtonEl);
+    submitButtonEl.addEventListener("click", submitScore);
+}
+
 
 // Create "answer" buttons for quiz question
 var createButtonsQuiz = function(arQuestion){
@@ -29,7 +99,7 @@ var createButtonsQuiz = function(arQuestion){
         quizButtonEl.setAttribute("data-button-id", i);
 
         var buttonDivEl = document.createElement("div");
-        buttonDivEl.className="paddingButton";
+        buttonDivEl.className="padding10";
         buttonDivEl.appendChild(quizButtonEl);
 
         mainEl.querySelector(".page-content").appendChild(buttonDivEl);
@@ -41,9 +111,7 @@ var createButtonsQuiz = function(arQuestion){
 var quizQuestions = function(){
 
     //create container div 
-    var containerEl = document.createElement("div");
-    mainEl.appendChild(containerEl);
-    containerEl.className="page-content";
+    var containerEl = createContainerElement();
 
     //question
     var questionDivEl = document.createElement("div");
@@ -67,19 +135,21 @@ var quizQuestions = function(){
 //move to the next step after a question is answered
 var nextStepQuiz = function(){
 
+    mainEl.querySelector(".page-content").remove();
+
     //ask next question
     if (questionNumber < quiz.length-1){
         questionNumber++;
-        mainEl.querySelector(".page-content").remove();
         quizQuestions();
     }
+    else
+        saveScoreScreen();
 }
 
 
 //quiz answer button clicked
 var quizButtonClick = function(event){
     var targetEl = event.target;
-    console.log(targetEl);
 
     if (targetEl.matches(".btn")){
         var buttonId = targetEl.getAttribute("data-button-id");
@@ -94,7 +164,7 @@ var quizButtonClick = function(event){
         }
     }
 
-    setTimeout(nextStepQuiz, 1500);
+    setTimeout(nextStepQuiz, 1000);
 }
 
 quizQuestions();
