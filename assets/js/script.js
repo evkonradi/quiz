@@ -1,23 +1,27 @@
 var quiz= [
     {
-        q: "Question1", a: ["answer1-1", "answer1-2", "answer1-3", "answer1-4"], aCorrect: 2
+        q: "Question1", a: ["answer1-1", "answer1-2", "answer1-3-correct", "answer1-4"], aCorrect: 2
     },
     {
-        q: "Question2", a: ["answer2-1", "answer2-2", "answer2-3", "answer2-4"], aCorrect: 1
+        q: "Question2", a: ["answer2-1", "answer2-2-correct", "answer2-3", "answer2-4"], aCorrect: 1
     },
     {
-        q: "Question3", a: ["answer3-1", "answer3-2", "answer3-3", "answer3-4"], aCorrect: 3
+        q: "Question3", a: ["answer3-1", "answer3-2", "answer3-3", "answer3-4-correct"], aCorrect: 3
     },
     {
-        q: "Question4", a: ["answer4-1", "answer4-2", "answer4-3", "answer4-4"], aCorrect: 4
+        q: "Question4", a: ["answer4-1-correct", "answer4-2", "answer4-3", "answer4-4"], aCorrect: 0
     },
     {
-        q: "Question5", a: ["answer5-1", "answer5-2", "answer5-3", "answer5-4"], aCorrect: 4
+        q: "Question5", a: ["answer5-1", "answer5-2-correct", "answer5-3", "answer5-4"], aCorrect: 1
     }
 ]
 var mainEl = document.querySelector("#mainSection");
+var timerCountDownEl = document.querySelector("header #spanTimer");
+var timerCountDownInitial = 50;
+var timerCountDown = timerCountDownInitial;
 var questionNumber = 0;
 var score = 0;
+var timerRef; 
 
 //create container element
 var createContainerElement = function(){
@@ -63,6 +67,8 @@ var goBack = function(){
     mainEl.querySelector(".page-content").remove();
     questionNumber = 0;
     score = 0;
+    timerCountDown = timerCountDownInitial;
+    timerCountDownEl.textContent = "0";
     quizStart();
 }
 
@@ -128,14 +134,18 @@ var submitScore = function(){
 }
 
 //Save Score to local storage screen
-var saveScoreScreen = function(){
+var saveScoreScreen = function(timeOut){
     var containerEl = createContainerElement();
 
     //all done div
-    addDivContainer(containerEl, "<h2><span id='allDone'>All done!</span></h2>", null );
+    if (timeOut)
+        addDivContainer(containerEl, "<h2><span id='allDone'>Time is Out!</span></h2>", null );
+    else
+        addDivContainer(containerEl, "<h2><span id='allDone'>All done!</span></h2>", null );
 
     //your final score div
     addDivContainer(containerEl, "<span>" + "You final score is " + score + ".</span>", null );
+        
 
     //enter Initials div wrapper with flex elements
     var divEl = addDivContainer(containerEl, "", "flexWrapper");
@@ -158,7 +168,7 @@ var createButtonsQuiz = function(arQuestion){
     for (i =0; i < arQuestion.length; i++){
         var quizButtonEl = document.createElement("button");
         quizButtonEl.textContent = arQuestion[i];
-        quizButtonEl.className = "btn";
+        quizButtonEl.className = "btn btnWidth";
         quizButtonEl.setAttribute("data-button-id", i);
 
         var buttonDivEl = document.createElement("div");
@@ -206,7 +216,10 @@ var nextStepQuiz = function(){
         quizQuestions();
     }
     else
-        saveScoreScreen();
+    {
+        clearInterval(timerRef);
+        saveScoreScreen(false);
+    }
 }
 
 
@@ -220,19 +233,49 @@ var quizButtonClick = function(event){
         if (buttonId == quiz[questionNumber].aCorrect)
         {
             score++;
-            correctOrWrongEl.textContent = "Correct!"
+            correctOrWrongEl.textContent = "Correct!";
         }
         else{
-            correctOrWrongEl.textContent = "Wrong!"
+            correctOrWrongEl.textContent = "Wrong!";
+            timerCountDown = timerCountDown - 10;
+            if (timerCountDown < 0)
+                timerCountDown = 0;
+            timerCountDownEl.textContent = timerCountDown;
+
+            if (timerCountDown == 0 ){
+                clearInterval(timerRef);
+                mainEl.querySelector(".page-content").remove();
+                saveScoreScreen(true);
+                return;
+            }
         }
     }
 
     setTimeout(nextStepQuiz, 1000);
 }
 
+// update time left
+var changeTimeLeft = function(){
+
+    if (timerCountDown == 0){
+        clearInterval(timerRef);
+        mainEl.querySelector(".page-content").remove();
+        saveScoreScreen(true);
+        return;
+    }
+
+    timerCountDown--;
+    timerCountDownEl.textContent = timerCountDown;
+}
+
 //start Quiz button clicked
 var startQuizQuestions = function(){
     mainEl.querySelector(".page-content").remove();
+
+    //start timer
+    timerCountDownEl.textContent = timerCountDown;
+    timerRef = setInterval(changeTimeLeft, 1000);
+
     quizQuestions();
 }
 

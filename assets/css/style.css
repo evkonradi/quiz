@@ -29,6 +29,12 @@ h2{
     font-weight: bold;
 }
 
+header{
+    text-align: right;
+    width: 100%;
+    padding: 20px 40px 20px 0px;
+}
+
 .padding10{
     padding: 10px;
 }
@@ -72,6 +78,10 @@ h2{
     top: -2px;
     background: var(--secondary) ;
     cursor: pointer;
+}
+
+.btnWidth{
+    width: 400px;
 }
 
 .answerResult{
