@@ -33,6 +33,10 @@ h2{
     padding: 10px;
 }
 
+.textAlignCenter{
+    text-align: center;
+}
+
 .page-content {
     flex: 1;
     display: flex;

@@ -60,12 +60,18 @@ var scoresLocalStorage = function(){
 
 //Go Back button clicked
 var goBack = function(){
-
+    mainEl.querySelector(".page-content").remove();
+    questionNumber = 0;
+    score = 0;
+    quizStart();
 }
 
 //Clear high scores button clicked
 var clearScores = function(){
-
+    localStorage.clear();
+    var ulEl = mainEl.querySelector("ul");
+    while (ulEl.firstChild)
+        ulEl.removeChild(ulEl.firstChild);
 }
 
 // High score screen
@@ -224,4 +230,27 @@ var quizButtonClick = function(event){
     setTimeout(nextStepQuiz, 1000);
 }
 
-quizQuestions();
+//start Quiz button clicked
+var startQuizQuestions = function(){
+    mainEl.querySelector(".page-content").remove();
+    quizQuestions();
+}
+
+//Start Quiz Screen
+var quizStart = function(){
+    var containerEl = createContainerElement();
+
+    //Heading - Coding Quiz Challenge
+    addDivContainer(containerEl, "<h2>Coding Quiz Challenge</h2>", null );
+
+    //About the quiz
+    addDivContainer(containerEl, "Try to answer the following questions within the time limit.</br>Keep in mind that incorrect answers will penalize your score/time by ten seconds.", "textAlignCenter padding10");
+
+    //Start quiz button
+    var divButton1 = addDivContainer(containerEl, "", "padding10");
+    var btnStart = createButton("Start Quiz", "btn padding10");
+    divButton1.appendChild(btnStart);
+    btnStart.addEventListener("click", startQuizQuestions);
+}
+
+quizStart();
